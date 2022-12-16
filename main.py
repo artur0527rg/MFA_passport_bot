@@ -45,7 +45,6 @@ def my_marks(user_id):
         bts.add(InlineKeyboardButton(item[1], callback_data=f'delete'))
     return bts
 
-
 @dp.message_handler(commands=['start'])
 @dp.message_handler(regexp='^Home')
 async def main(message):
@@ -76,10 +75,7 @@ async def add_identifier(message):
 @dp.callback_query_handler(text='delete')
 async def delete(call):
     db.delete_record(call['from'].id)
-    await call.message.answer('Документ більше не відстежується', reply_markup = kbs)
-    
-    
-        
+    await call.message.answer('Документ більше не відстежується', reply_markup = kbs)        
 
 
 async def test():
@@ -101,11 +97,6 @@ async def test():
             else:
                 await bot.send_message(obj[0], f'Запис про документ {obj[1]} застарів і був видалений.', reply_markup = kbs)
                 db.delete_record(obj[0])
-               
-
-
-            
-        
 
 
 if __name__ == "__main__":
