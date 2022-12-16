@@ -26,6 +26,15 @@ db = DataBase('db.sqlite3')
 # Create scraper
 scrap = Scraper()
 
+ALL_STATUS =(
+    '⚫ Заявку подано\n'
+    '⚫ Дані відправлено на перевірку\n'
+    '⚫ Дані відправлено на персоналізацію\n'
+    '⚫ Документ виготовлено\n'
+    '⚫ Документ прибув до ЗДУ\n'
+    '⚫ Документ видано\n'
+)
+
 #Main button
 button_home = KeyboardButton('Home🏠')
 kbs = ReplyKeyboardMarkup(resize_keyboard=True).add(button_home)
@@ -42,10 +51,10 @@ def my_marks(user_id):
 async def main(message):
     await message.answer(
         ("Щоб відстежувати новий документ, "
-        "введіть його id(наприклад:800101) у"
-        " поле \"Написати повідомлення\".\n\n"
+        "відправте його ID\n(наприклад:800101)"
+        "\n\n"
         "Щоб перестати відстежувати документ - "
-        "натисніть на його id у списку нижче."),
+        "натисніть на його ID у списку нижче."),
         reply_markup = my_marks(message["from"].id),
         )
     await message.delete()
@@ -56,7 +65,7 @@ async def add_identifier(message):
         mesg, *status = scrap.check(message.text)
         if mesg:
             db.add_identifier(message['from'].id, message.text, status[0])
-            await message.answer(f"Додано зі статусом \"{mesg}\"", reply_markup = kbs)
+            await message.answer(f"Документ відстежується\n🟢\"{mesg}\"\n\n" + "Всі статуси:\n" + ALL_STATUS, reply_markup = kbs)
         elif mesg == None:
             await message.answer("Сервер оффлайн, звернітся пізніше.", reply_markup = kbs)
         else:
@@ -85,7 +94,7 @@ async def test():
             rez, *status = scrap.check(obj[1])
             if rez:
                  if status[0] != obj[2]:
-                    await bot.send_message(obj[0], f'Статус вашого документа оновлено \"{rez}\". Більш детальна інформація - http://passport.mfa.gov.ua/', reply_markup = kbs)
+                    await bot.send_message(obj[0], f'Статус вашого документа оновлен.\n🟢\"{rez}\"\n\n' + "Всі статуси:\n" + ALL_STATUS, reply_markup = kbs)
                     db.update_record(obj[0], status[0])
             elif rez == None:
                 await bot.send_message(ADMIN_ID, 'Сервер не отвечает')
